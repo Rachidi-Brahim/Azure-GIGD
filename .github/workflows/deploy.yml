@@ -1,28 +1,24 @@
-name: Deploiement vers Azure
+name: Deploy Node.js JSON Counter
 
 on:
   push:
     branches:
-      - main  # Le déploiement se lance quand vous poussez sur la branche main
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Recuperer le code
-        uses: actions/checkout@v3
-
-      - name: Installer Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '18'
-
-      - name: Installer les dependances
-        run: npm install
-
-      - name: Deployer sur Azure Web App
-        uses: azure/webapps-deploy@v2
+          node-version: '22'
+      - run: npm install
+      - run: zip -r app.zip .
+      - uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          publish-profile: ${{
+secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: app.zip
