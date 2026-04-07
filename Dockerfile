@@ -9,8 +9,7 @@ RUN npm install
 
 COPY . .
 
-# Port exposé (Azure injecte PORT mais on met 3000 par
-défaut)
+# Port exposé (Azure injecte PORT mais on met 3000 par défaut
 EXPOSE 3000
 
 # Commande de lancement
