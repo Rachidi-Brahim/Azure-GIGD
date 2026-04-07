@@ -47,7 +47,12 @@ app.get("/", async (req, res) => {
       <h2>Compteur de visites</h2>
       <p><strong>Nombre de visites :</strong> ${count}</p>
       <hr>
-      
+      <h3>Infos serveur</h3>
+      <p>Hostname : ${req.hostname}</p>
+      <p>IP serveur : ${req.socket.localAddress}</p>
+      <hr>
+      <h3>Infos client</h3>
+      <p>IP client : ${clientIP}</p>
     `);
   } finally {
     lock = false;
