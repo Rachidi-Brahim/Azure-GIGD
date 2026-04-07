@@ -1,0 +1,42 @@
+name: Build and Deploy Container to Azure
+
+on:
+  push:
+    branches:
+      - main
+  # Permet de lancer le déploiement manuellement depuis l'onglet Actions
+  workflow_dispatch: 
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Récupération du code source
+      - name: Checkout GitHub Action
+        uses: actions/checkout@v3
+
+      # 2. Connexion à Azure (via le secret JSON)
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # 3. Connexion au registre Docker Azure (ACR)
+      - name: Login to ACR
+        run: |
+          echo ${{ secrets.ACR_PASSWORD }} | docker login ${{ secrets.ACR_LOGIN_SERVER }} \
+          -u ${{ secrets.ACR_USERNAME }} --password-stdin
+
+      # 4. Construction et Envoi de l'image Docker
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/node-app:latest .
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/node-app:latest
+
+      # 5. Déploiement de l'image sur la Web App Azure
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          images: ${{ secrets.ACR_LOGIN_SERVER }}/node-app:latest
